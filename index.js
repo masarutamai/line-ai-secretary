@@ -28,7 +28,39 @@ const googleOAuth2Client = new google.auth.OAuth2(
 app.get("/", (req, res) => {
   res.send("LINE AI Secretary is running.");
 });
+app.get("/auth/google", (req, res) => {
+  const authUrl = googleOAuth2Client.generateAuthUrl({
+    access_type: "offline",
+    prompt: "consent",
+    scope: [
+      "https://www.googleapis.com/auth/calendar.readonly",
+    ],
+  });
 
+  res.redirect(authUrl);
+});
+
+app.get("/auth/google/callback", async (req, res) => {
+  try {
+    const code = req.query.code;
+
+    if (!code) {
+      return res.status(400).send("認証コードがありません。");
+    }
+
+    const { tokens } = await googleOAuth2Client.getToken(code);
+
+    res.send(`
+      <h2>Googleカレンダーとの接続に成功しました</h2>
+      <p>次の更新トークンをRenderへ登録します。</p>
+      <textarea rows="8" cols="80">${tokens.refresh_token || ""}</textarea>
+      <p>この文字列は他人に見せないでください。</p>
+    `);
+  } catch (error) {
+    console.error("Google認証エラー:", error);
+    res.status(500).send("Google認証に失敗しました。");
+  }
+});
 app.post("/webhook", line.middleware(config), async (req, res) => {
   res.status(200).end();
 
