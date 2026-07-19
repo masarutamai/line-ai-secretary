@@ -24,7 +24,14 @@ const googleOAuth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_SECRET,
   "https://line-ai-secretary-3e0w.onrender.com/auth/google/callback"
 );
+googleOAuth2Client.setCredentials({
+  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+});
 
+const calendar = google.calendar({
+  version: "v3",
+  auth: googleOAuth2Client,
+});
 app.get("/", (req, res) => {
   res.send("LINE AI Secretary is running.");
 });
@@ -70,7 +77,70 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
     console.error("Webhook処理エラー:", error);
   }
 });
+function getJstDateString(dayOffset = 0) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
 
+  const values = Object.fromEntries(
+    parts
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value])
+  );
+
+  const target = new Date(
+    Date.UTC(
+      Number(values.year),
+      Number(values.month) - 1,
+      Number(values.day) + dayOffset
+    )
+  );
+
+  return target.toISOString().slice(0, 10);
+}
+
+async function getCalendarSchedule(dayOffset, label) {
+  const startDate = getJstDateString(dayOffset);
+  const endDate = getJstDateString(dayOffset + 1);
+
+  const response = await calendar.events.list({
+    calendarId: "primary",
+    timeMin: `${startDate}T00:00:00+09:00`,
+    timeMax: `${endDate}T00:00:00+09:00`,
+    singleEvents: true,
+    orderBy: "startTime",
+    timeZone: "Asia/Tokyo",
+  });
+
+  const events = response.data.items || [];
+
+  if (events.length === 0) {
+    return `📅 ${label}の予定はありません。`;
+  }
+
+  const lines = events.map((calendarEvent) => {
+    const title = calendarEvent.summary || "タイトルなし";
+
+    if (calendarEvent.start?.date) {
+      return `・終日　${title}`;
+    }
+
+    const startTime = new Date(
+      calendarEvent.start.dateTime
+    ).toLocaleTimeString("ja-JP", {
+      timeZone: "Asia/Tokyo",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    return `・${startTime}　${title}`;
+  });
+
+  return `📅 ${label}の予定\n\n${lines.join("\n")}`;
+}
 async function handleEvent(event) {
   if (
     event.type !== "message" ||
@@ -80,7 +150,66 @@ async function handleEvent(event) {
   }
 
   const userText = event.message.text;
+const compactText = userText.replace(/\s/g, "");
 
+if (
+  compactText.includes("今日の予定") ||
+  compactText.includes("本日の予定")
+) {
+  try {
+    const scheduleText = await getCalendarSchedule(0, "今日");
+
+    return lineClient.replyMessage({
+      replyToken: event.replyToken,
+      messages: [
+        {
+          type: "text",
+          text: scheduleText,
+        },
+      ],
+    });
+  } catch (error) {
+    console.error("今日の予定取得エラー:", error);
+
+    return lineClient.replyMessage({
+      replyToken: event.replyToken,
+      messages: [
+        {
+          type: "text",
+          text: "申し訳ありません。Googleカレンダーの予定を取得できませんでした。",
+        },
+      ],
+    });
+  }
+}
+
+if (compactText.includes("明日の予定")) {
+  try {
+    const scheduleText = await getCalendarSchedule(1, "明日");
+
+    return lineClient.replyMessage({
+      replyToken: event.replyToken,
+      messages: [
+        {
+          type: "text",
+          text: scheduleText,
+        },
+      ],
+    });
+  } catch (error) {
+    console.error("明日の予定取得エラー:", error);
+
+    return lineClient.replyMessage({
+      replyToken: event.replyToken,
+      messages: [
+        {
+          type: "text",
+          text: "申し訳ありません。Googleカレンダーの予定を取得できませんでした。",
+        },
+      ],
+    });
+  }
+}
   try {
     const response = await openai.responses.create({
       model: "gpt-5-mini",
