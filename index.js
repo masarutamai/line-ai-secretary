@@ -150,6 +150,7 @@ async function handleEvent(event) {
   }
 
   const userText = event.message.text;
+  console.log("LINE_USER_ID:", event.source.userId);
 const compactText = userText.replace(/\s/g, "");
 
 if (
