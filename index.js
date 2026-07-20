@@ -323,8 +323,20 @@ ${schedule}
     console.log("朝レポートを送信しました。");
   } catch (error) {
     console.error("朝レポート作成・送信エラー:", error);
+    throw error;
   }
 }
+app.get("/morning-report", async (req, res) => {
+  try {
+    await sendMorningReport();
+
+    res.status(200).send("Morning report sent.");
+  } catch (error) {
+    console.error("朝レポート実行エラー:", error);
+
+    res.status(500).send("Morning report failed.");
+  }
+});
 app.listen(port, () => {
   console.log(`サーバー起動：http://localhost:${port}`);
 });
