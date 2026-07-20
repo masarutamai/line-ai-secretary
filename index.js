@@ -302,16 +302,24 @@ async function sendMorningReport() {
 ・・・
 `;
 
-  await lineClient.pushMessage(
-    process.env.LINE_USER_ID,
+await lineClient.pushMessage({
+  to: process.env.LINE_USER_ID,
+  messages: [
     {
       type: "text",
       text: report,
-    }
-  );
+    },
+  ],
+});
 }
-app.listen(port, async () => {
-  console.log(`サーバー起動 http://localhost:${port}`);
+app.listen(port, () => {
+  console.log(`サーバー起動：http://localhost:${port}`);
 
-  await sendMorningReport();
+  sendMorningReport()
+    .then(() => {
+      console.log("朝レポートのテスト送信に成功しました。");
+    })
+    .catch((error) => {
+      console.error("朝レポート送信エラー:", error);
+    });
 });
