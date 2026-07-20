@@ -150,7 +150,8 @@ async function handleEvent(event) {
   }
 
   const userText = event.message.text;
-  console.log("LINE_USER_ID:", event.source.userId);
+console.log("LINE_SOURCE:", JSON.stringify(event.source));
+console.log("LINE_USER_ID:", event.source?.userId || "取得できません");
 const compactText = userText.replace(/\s/g, "");
 
 if (
