@@ -285,41 +285,46 @@ if (compactText.includes("明日の予定")) {
 
 const port = process.env.PORT || 3000;
 async function sendMorningReport() {
+  try {
+    const schedule = await getCalendarSchedule(0, "今日");
 
-  const report = `
+    const report = `
 🌅 おはようございます！
 
-📅 今日の予定
-・・・
+${schedule}
 
 ✅ 今日の優先順位TOP3
-・・・
+1. LINE AI秘書の改善
+2. 健康管理ソフトの開発
+3. 今日の予定を確認して行動する
 
-🤖 AIニュース
-・・・
+⏰ 必要なリマインダー
+・予定の30分前に準備
+・開発内容をGitHubへ保存
+・無理をせず休憩を取る
+
+🤖 AI・ロボット注目ニュース
+現在はニュース取得機能を準備中です。
 
 💻 今日の開発
-・・・
+朝レポートを自動化する
 `;
 
-await lineClient.pushMessage({
-  to: process.env.LINE_USER_ID,
-  messages: [
-    {
-      type: "text",
-      text: report,
-    },
-  ],
-});
+    await lineClient.pushMessage({
+      to: process.env.LINE_USER_ID,
+      messages: [
+        {
+          type: "text",
+          text: report,
+        },
+      ],
+    });
+
+    console.log("朝レポートを送信しました。");
+  } catch (error) {
+    console.error("朝レポート作成・送信エラー:", error);
+  }
 }
 app.listen(port, () => {
   console.log(`サーバー起動：http://localhost:${port}`);
-
-  sendMorningReport()
-    .then(() => {
-      console.log("朝レポートのテスト送信に成功しました。");
-    })
-    .catch((error) => {
-      console.error("朝レポート送信エラー:", error);
-    });
 });
