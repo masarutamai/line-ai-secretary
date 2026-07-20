@@ -284,7 +284,34 @@ if (compactText.includes("明日の予定")) {
 }
 
 const port = process.env.PORT || 3000;
+async function sendMorningReport() {
 
-app.listen(port, () => {
-  console.log(`サーバー起動：http://localhost:${port}`);
+  const report = `
+🌅 おはようございます！
+
+📅 今日の予定
+・・・
+
+✅ 今日の優先順位TOP3
+・・・
+
+🤖 AIニュース
+・・・
+
+💻 今日の開発
+・・・
+`;
+
+  await lineClient.pushMessage(
+    process.env.LINE_USER_ID,
+    {
+      type: "text",
+      text: report,
+    }
+  );
+}
+app.listen(port, async () => {
+  console.log(`サーバー起動 http://localhost:${port}`);
+
+  await sendMorningReport();
 });
