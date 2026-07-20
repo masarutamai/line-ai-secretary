@@ -1,0 +1,31 @@
+name: Morning Report
+
+on:
+  schedule:
+    - cron: "30 21 * * *"
+
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wake Render
+        run: |
+          curl --fail \
+            --retry 3 \
+            --retry-delay 20 \
+            --max-time 180 \
+            "https://line-ai-secretary-3e0w.onrender.com/"
+
+      - name: Send Morning Report
+        env:
+          MORNING_REPORT_SECRET: ${{ secrets.MORNING_REPORT_SECRET }}
+        run: |
+          curl --fail \
+            --retry 3 \
+            --retry-delay 20 \
+            --max-time 180 \
+            -H "x-morning-secret: ${MORNING_REPORT_SECRET}" \
+            "https://line-ai-secretary-3e0w.onrender.com/morning-report"
