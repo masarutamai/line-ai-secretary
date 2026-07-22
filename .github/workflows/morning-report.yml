@@ -2,8 +2,7 @@ name: Morning Report
 
 on:
   schedule:
-    - cron: "30 6 * * *"
-      timezone: "Asia/Tokyo"
+    - cron: "30 21 * * *"
 
   workflow_dispatch:
 
