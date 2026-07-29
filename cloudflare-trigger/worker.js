@@ -1,3 +1,4 @@
+// Cloudflare auto-deploy test
 async function dispatchMorningReport(env) {
   const url =
     "https://api.github.com/repos/masarutamai/line-ai-secretary/actions/workflows/morning-report.yml/dispatches";
