@@ -156,6 +156,11 @@ const requestId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   }
 
   const userText = event.message.text;
+console.log("OBSERVABILITY", {
+  requestId: requestId,
+  stage: "input_received",
+  input: userText,
+});
 console.log("LINE_SOURCE:", JSON.stringify(event.source));
 console.log("LINE_USER_ID:", event.source?.userId || "取得できません");
 const compactText = userText.replace(/\s/g, "");
