@@ -18,7 +18,12 @@ const lineClient = new line.messagingApi.MessagingApiClient({
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
+function logJudgment(data) {
+  console.log("JUDGMENT", {
+    timestamp: new Date().toISOString(),
+    ...data,
+  });
+}
 const googleOAuth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
@@ -160,7 +165,11 @@ if (
 ) {
   try {
     const scheduleText = await getCalendarSchedule(0, "今日");
-
+logJudgment({
+  decision: "calendar_today",
+  reason: "user_requested_today_schedule",
+  input: userText,
+});
     return lineClient.replyMessage({
       replyToken: event.replyToken,
       messages: [
