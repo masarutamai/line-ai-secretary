@@ -166,6 +166,7 @@ if (
   try {
     const scheduleText = await getCalendarSchedule(0, "今日");
 logJudgment({
+category: "TOOL",
   decision: "calendar_today",
   reason: "user_requested_today_schedule",
   input: userText,
@@ -197,7 +198,12 @@ logJudgment({
 if (compactText.includes("明日の予定")) {
   try {
     const scheduleText = await getCalendarSchedule(1, "明日");
-
+logJudgment({
+  category: "TOOL",
+  decision: "calendar_tomorrow",
+  reason: "user_requested_tomorrow_schedule",
+  input: userText,
+});
     return lineClient.replyMessage({
       replyToken: event.replyToken,
       messages: [
@@ -221,8 +227,32 @@ if (compactText.includes("明日の予定")) {
     });
   }
 }
+if (
+  compactText.includes("予定") &&
+  !compactText.includes("今日") &&
+  !compactText.includes("本日") &&
+  !compactText.includes("明日")
+) {
+  logJudgment({
+    category: "CLARIFY",
+    decision: "ask_schedule_date",
+    reason: "schedule_date_missing",
+    input: userText,
+  });
+
+  return lineClient.replyMessage({
+    replyToken: event.replyToken,
+    messages: [
+      {
+        type: "text",
+        text: "今日の予定ですか？それとも明日の予定ですか？",
+      },
+    ],
+  });
+}
   try {
 logJudgment({
+category: "MODEL",
   decision: "openai_response",
   reason: "no_calendar_intent_matched",
   input: userText,
