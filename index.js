@@ -37,6 +37,25 @@ async function getMemoryById(memoryId) {
   const rows = await response.json();
   return rows[0] || null;
 }
+app.get("/test-memory", async (req, res) => {
+  try {
+    const memory = await getMemoryById(1);
+
+    console.log("MEMORY_TEST", memory);
+
+    res.json({
+      ok: true,
+      memory: memory
+    });
+  } catch (error) {
+    console.error("MEMORY_TEST_ERROR", error);
+
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
 function logJudgment(data) {
   console.log("JUDGMENT", {
     timestamp: new Date().toISOString(),
