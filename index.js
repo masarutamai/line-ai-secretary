@@ -147,6 +147,7 @@ async function getCalendarSchedule(dayOffset, label) {
   return `📅 ${label}の予定\n\n${lines.join("\n")}`;
 }
 async function handleEvent(event) {
+const requestId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   if (
     event.type !== "message" ||
     event.message.type !== "text"
@@ -166,6 +167,7 @@ if (
   try {
     const scheduleText = await getCalendarSchedule(0, "今日");
 logJudgment({
+requestId: requestId,
 category: "TOOL",
   decision: "calendar_today",
   reason: "user_requested_today_schedule",
@@ -199,6 +201,7 @@ if (compactText.includes("明日の予定")) {
   try {
     const scheduleText = await getCalendarSchedule(1, "明日");
 logJudgment({
+requestId: requestId,
   category: "TOOL",
   decision: "calendar_tomorrow",
   reason: "user_requested_tomorrow_schedule",
@@ -234,6 +237,7 @@ if (
   !compactText.includes("明日")
 ) {
   logJudgment({
+requestId: requestId,
     category: "CLARIFY",
     decision: "ask_schedule_date",
     reason: "schedule_date_missing",
@@ -252,6 +256,7 @@ if (
 }
   try {
 logJudgment({
+requestId: requestId,
 category: "MODEL",
   decision: "openai_response",
   reason: "no_calendar_intent_matched",
