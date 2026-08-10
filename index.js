@@ -18,6 +18,25 @@ const lineClient = new line.messagingApi.MessagingApiClient({
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+async function getMemoryById(memoryId) {
+  const url =
+    `${process.env.SUPABASE_URL}/rest/v1/memories` +
+    `?memory_id=eq.${memoryId}&select=*`;
+
+  const response = await fetch(url, {
+    headers: {
+      apikey: process.env.SUPABASE_SECRET_KEY,
+      Authorization: `Bearer ${process.env.SUPABASE_SECRET_KEY}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Supabase read failed: ${response.status}`);
+  }
+
+  const rows = await response.json();
+  return rows[0] || null;
+}
 function logJudgment(data) {
   console.log("JUDGMENT", {
     timestamp: new Date().toISOString(),
