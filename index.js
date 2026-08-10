@@ -293,7 +293,16 @@ async function sendMorningReport() {
   });
   try {
     const schedule = await getCalendarSchedule(0, "今日");
-
+const top3 = [
+  { item_id: "P1", proposal: "LINE AI秘書の改善" },
+  { item_id: "P2", proposal: "健康管理ソフトの開発" },
+  { item_id: "P3", proposal: "今日の予定を確認して行動する" },
+];
+console.log("JUDGMENT_PROPOSAL", {
+  report_id: reportId,
+  proposals: top3,
+  created_at: new Date().toISOString(),
+});
     const report = `
 🌅 おはようございます！
 
