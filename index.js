@@ -222,6 +222,11 @@ if (compactText.includes("明日の予定")) {
   }
 }
   try {
+logJudgment({
+  decision: "openai_response",
+  reason: "no_calendar_intent_matched",
+  input: userText,
+});
     const response = await openai.responses.create({
       model: "gpt-5-mini",
       instructions: `
