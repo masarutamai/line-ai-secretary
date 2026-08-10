@@ -285,6 +285,12 @@ if (compactText.includes("明日の予定")) {
 
 const port = process.env.PORT || 3000;
 async function sendMorningReport() {
+    const reportId = `${getJstDateString()}-morning`;
+
+  console.log("MORNING_REPORT_START", {
+    report_id: reportId,
+    started_at: new Date().toISOString(),
+  });
   try {
     const schedule = await getCalendarSchedule(0, "今日");
 
@@ -320,9 +326,16 @@ ${schedule}
       ],
     });
 
-    console.log("朝レポートを送信しました。");
+console.log("MORNING_REPORT_SUCCESS", {
+  report_id: reportId,
+  completed_at: new Date().toISOString(),
+});
   } catch (error) {
-    console.error("朝レポート作成・送信エラー:", error);
+console.error("MORNING_REPORT_ERROR", {
+  report_id: reportId,
+  failed_at: new Date().toISOString(),
+  error: error.message,
+});
     throw error;
   }
 }
