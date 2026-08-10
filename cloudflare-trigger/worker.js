@@ -40,7 +40,7 @@ const url = new URL(request.url);
 if (url.pathname === "/test-memory") {
   try {
     const response = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/memory?select=*`,
+      `${env.SUPABASE_URL}/rest/v1/memories?select=*`,
       {
         headers: {
           apikey: env.SUPABASE_SECRET_KEY,
