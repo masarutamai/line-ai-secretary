@@ -38,11 +38,37 @@ export default {
 const url = new URL(request.url);
 
 if (url.pathname === "/test-memory") {
-  return new Response("test-memory route reached", {
-    status: 200,
-  });
-}
-    try {
+  try {
+    const response = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/memory?select=*`,
+      {
+        headers: {
+          apikey: env.SUPABASE_SECRET_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SECRET_KEY}`,
+        },
+      }
+    );
+
+    const body = await response.text();
+
+    return new Response(body, {
+      status: response.status,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+}    try {
       const status = await dispatchMorningReport(env);
 
       return new Response(
