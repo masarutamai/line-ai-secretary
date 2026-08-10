@@ -15,7 +15,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "googleapis": "^173.0.0",
-"openai": "^6.48.0",
-"@supabase/supabase-js": "^2.57.4"
+"openai": "^6.48.0"
+
   }
 }
