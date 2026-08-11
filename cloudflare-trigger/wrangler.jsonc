@@ -2,6 +2,9 @@
   "name": "morning-report-trigger",
   "main": "worker.js",
   "compatibility_date": "2026-07-29",
+"vars": {
+  "SUPABASE_URL": "https://cgzlxbrijtyihlecbvjp.supabase.co"
+},
   "triggers": {
     "crons": ["30 21 * * *"]
   }
