@@ -38,6 +38,13 @@ export default {
 const url = new URL(request.url);
 
 if (url.pathname === "/test-memory") {
+const authHeader = request.headers.get("Authorization");
+
+if (authHeader !== `Bearer ${env.MEMORY_TEST_TOKEN}`) {
+  return new Response("Unauthorized", {
+    status: 401,
+  });
+}
   try {
     const response = await fetch(
       `${env.SUPABASE_URL}/rest/v1/memories?select=*`,
