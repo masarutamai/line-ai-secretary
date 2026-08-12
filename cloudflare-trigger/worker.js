@@ -51,7 +51,16 @@ async function dispatchMorningReport(env) {
       `GitHub dispatch failed: ${response.status} ${body}`
     );
   }
-
+try {
+  await writeObservabilityLog(
+    env,
+    "morning_report_dispatch",
+    "success",
+    `GitHub Actions dispatch succeeded with status ${response.status}`
+  );
+} catch (logError) {
+  console.error("Observability log write failed:", logError);
+}
   return response.status;
 }
 
