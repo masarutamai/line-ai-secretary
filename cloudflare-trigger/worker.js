@@ -1,4 +1,30 @@
 // Cloudflare auto-deploy test
+async function writeObservabilityLog(env, eventType, status, detail) {
+  const response = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/observability_logs`,
+    {
+      method: "POST",
+      headers: {
+        apikey: env.SUPABASE_SECRET_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SECRET_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        event_type: eventType,
+        status: status,
+        detail: detail,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(
+      `Observability log failed: ${response.status} ${body}`
+    );
+  }
+}
 async function dispatchMorningReport(env) {
   const url =
     "https://api.github.com/repos/masarutamai/line-ai-secretary/actions/workflows/morning-report.yml/dispatches";
@@ -57,8 +83,18 @@ if (authHeader !== `Bearer ${env.MEMORY_TEST_TOKEN}`) {
     );
 
     const body = await response.text();
-
-    return new Response(body, {
+if (response.ok) {
+  try {
+    await writeObservabilityLog(
+      env,
+      "memory_read_test",
+      "success",
+      "Supabase memories read test succeeded"
+    );
+  } catch (logError) {
+    console.error("Observability log write failed:", logError);
+  }
+}    return new Response(body, {
       status: response.status,
       headers: {
         "Content-Type": "application/json",
