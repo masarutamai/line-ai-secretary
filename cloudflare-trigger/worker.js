@@ -125,7 +125,7 @@ export default {
 
   async fetch(request, env, ctx) {
 const url = new URL(request.url);
-
+const testTime = url.searchParams.get("testTime");
 if (url.pathname === "/test-memory") {
 const authHeader = request.headers.get("Authorization");
 
@@ -175,7 +175,9 @@ if (response.ok) {
     );
   }
 }    try {
-const decision = isMorningReportWindowJST() ? "send" : "skip";
+const decision = isMorningReportWindowJST(
+  testTime ? new Date(`2026-08-14T${testTime}:00+09:00`) : new Date()
+) ? "send" : "skip";
 
 const reason =
   decision === "send"
