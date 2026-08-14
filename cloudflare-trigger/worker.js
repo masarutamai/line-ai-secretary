@@ -175,13 +175,21 @@ if (response.ok) {
     );
   }
 }    try {
+const decision = isMorningReportWindowJST() ? "send" : "skip";
+
+const reason =
+  decision === "send"
+    ? "Current time is within the morning report window"
+    : "Current time is outside the morning report window";
+
 await writeJudgmentLog(
   env,
   "morning_report",
-  "send",
+  decision,
   "high",
-  "Scheduled morning report dispatch"
+  reason
 );
+
       const status = await dispatchMorningReport(env);
 
       return new Response(
