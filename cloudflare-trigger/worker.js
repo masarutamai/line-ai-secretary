@@ -189,7 +189,12 @@ await writeJudgmentLog(
   "high",
   reason
 );
-
+if (decision === "skip") {
+  return new Response(
+    "Morning Report skipped: outside the 06:20-06:40 JST window",
+    { status: 200 }
+  );
+}
       const status = await dispatchMorningReport(env);
 
       return new Response(
