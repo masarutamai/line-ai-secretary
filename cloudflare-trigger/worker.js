@@ -25,6 +25,22 @@ async function writeObservabilityLog(env, eventType, status, detail) {
     );
   }
 }
+function isMorningReportWindowJST(now = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tokyo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(now);
+
+  const hour = Number(parts.find((p) => p.type === "hour").value);
+  const minute = Number(parts.find((p) => p.type === "minute").value);
+
+  const totalMinutes = hour * 60 + minute;
+
+  return totalMinutes >= 6 * 60 + 20 &&
+         totalMinutes <= 6 * 60 + 40;
+}
 async function writeJudgmentLog(env, subject, decision, confidence, reason) {
   const allowedDecisions = ["send", "skip", "defer", "alert"];
   const allowedConfidence = ["high", "medium", "low"];
