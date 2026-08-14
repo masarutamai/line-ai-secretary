@@ -25,6 +25,44 @@ async function writeObservabilityLog(env, eventType, status, detail) {
     );
   }
 }
+async function writeJudgmentLog(env, subject, decision, confidence, reason) {
+  const allowedDecisions = ["send", "skip", "defer", "alert"];
+  const allowedConfidence = ["high", "medium", "low"];
+
+  if (!allowedDecisions.includes(decision)) {
+    throw new Error(`Invalid decision: ${decision}`);
+  }
+
+  if (!allowedConfidence.includes(confidence)) {
+    throw new Error(`Invalid confidence: ${confidence}`);
+  }
+
+  const response = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/judgment_logs`,
+    {
+      method: "POST",
+      headers: {
+        apikey: env.SUPABASE_SECRET_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SECRET_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        subject,
+        decision,
+        confidence,
+        reason,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(
+      `Judgment log failed: ${response.status} ${body}`
+    );
+  }
+}
 async function dispatchMorningReport(env) {
   const url =
     "https://api.github.com/repos/masarutamai/line-ai-secretary/actions/workflows/morning-report.yml/dispatches";
