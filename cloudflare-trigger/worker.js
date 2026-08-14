@@ -159,6 +159,13 @@ if (response.ok) {
     );
   }
 }    try {
+await writeJudgmentLog(
+  env,
+  "morning_report_test",
+  "send",
+  "high",
+  "Judgment log write test"
+);
       const status = await dispatchMorningReport(env);
 
       return new Response(
