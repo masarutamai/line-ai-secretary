@@ -161,10 +161,10 @@ if (response.ok) {
 }    try {
 await writeJudgmentLog(
   env,
-  "morning_report_test",
+  "morning_report",
   "send",
   "high",
-  "Judgment log write test"
+  "Scheduled morning report dispatch"
 );
       const status = await dispatchMorningReport(env);
 
