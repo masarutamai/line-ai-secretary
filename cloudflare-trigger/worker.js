@@ -41,6 +41,37 @@ function isMorningReportWindowJST(now = new Date()) {
   return totalMinutes >= 6 * 60 + 20 &&
          totalMinutes <= 6 * 60 + 40;
 }
+async function hasSuccessfulDispatchTodayJST(env) {
+  const now = new Date();
+
+  const jstDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+
+  const startJST = new Date(`${jstDate}T00:00:00+09:00`).toISOString();
+
+  const response = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/observability_logs?event_type=eq.morning_report_dispatch&status=eq.success&created_at=gte.${encodeURIComponent(startJST)}&select=id&limit=1`,
+    {
+      headers: {
+        apikey: env.SUPABASE_SECRET_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SECRET_KEY}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Dispatch history check failed: ${response.status} ${body}`);
+  }
+
+  const rows = await response.json();
+  return rows.length > 0;
+}
+
 async function writeJudgmentLog(env, subject, decision, confidence, reason) {
   const allowedDecisions = ["send", "skip", "defer", "alert"];
   const allowedConfidence = ["high", "medium", "low"];
