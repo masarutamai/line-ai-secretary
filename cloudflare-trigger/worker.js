@@ -157,6 +157,17 @@ export default {
   async fetch(request, env, ctx) {
 const url = new URL(request.url);
 const testTime = url.searchParams.get("testTime");
+if (url.pathname === "/test-dispatch-history") {
+  const alreadySent = await hasSuccessfulDispatchTodayJST(env);
+
+  return new Response(
+    JSON.stringify({ alreadySent }),
+    {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+}
 if (url.pathname === "/test-memory") {
 const authHeader = request.headers.get("Authorization");
 
