@@ -221,7 +221,10 @@ if (response.ok) {
     );
   }
 }    try {
-const alreadySent = await hasSuccessfulDispatchTodayJST(env);
+const alreadySent =
+  testAlreadySent === "false"
+    ? false
+    : await hasSuccessfulDispatchTodayJST(env);
 
 const withinWindow = isMorningReportWindowJST(
   testTime ? new Date(`2026-08-14T${testTime}:00+09:00`) : new Date()
