@@ -253,6 +253,22 @@ if (decision === "skip") {
     { status: 200 }
   );
 }
+if (testTime !== null || testAlreadySent !== null) {
+  return new Response(
+    JSON.stringify({
+      testMode: true,
+      alreadySent,
+      withinWindow,
+      decision,
+      reason,
+      dispatched: false
+    }),
+    {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    }
+  );
+}
       const status = await dispatchMorningReport(env);
 
       return new Response(
