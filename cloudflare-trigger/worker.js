@@ -217,15 +217,22 @@ if (response.ok) {
     );
   }
 }    try {
-const decision = isMorningReportWindowJST(
+const alreadySent = await hasSuccessfulDispatchTodayJST(env);
+
+const withinWindow = isMorningReportWindowJST(
   testTime ? new Date(`2026-08-14T${testTime}:00+09:00`) : new Date()
-) ? "send" : "skip";
+);
+
+const decision =
+  alreadySent ? "skip" :
+  withinWindow ? "send" : "skip";
 
 const reason =
-  decision === "send"
-    ? "Current time is within the morning report window"
-    : "Current time is outside the morning report window";
-
+  alreadySent
+    ? "Morning report already dispatched successfully today"
+    : withinWindow
+      ? "Current time is within the morning report window"
+      : "Current time is outside the morning report window";
 await writeJudgmentLog(
   env,
   "morning_report",
@@ -235,7 +242,7 @@ await writeJudgmentLog(
 );
 if (decision === "skip") {
   return new Response(
-    "Morning Report skipped: outside the 06:20-06:40 JST window",
+    reason,
     { status: 200 }
   );
 }
