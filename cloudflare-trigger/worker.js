@@ -157,6 +157,7 @@ export default {
   async fetch(request, env, ctx) {
 const url = new URL(request.url);
 const testTime = url.searchParams.get("testTime");
+const testAlreadySent = url.searchParams.get("testAlreadySent");
 if (url.pathname === "/test-dispatch-history") {
   const alreadySent = await hasSuccessfulDispatchTodayJST(env);
 
