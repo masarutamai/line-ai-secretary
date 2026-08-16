@@ -159,7 +159,10 @@ const url = new URL(request.url);
 const testTime = url.searchParams.get("testTime");
 const testAlreadySent = url.searchParams.get("testAlreadySent");
 if (url.pathname === "/test-dispatch-history") {
-  const alreadySent = await hasSuccessfulDispatchTodayJST(env);
+const alreadySent =
+  testAlreadySent === "false"
+    ? false
+    : await hasSuccessfulDispatchTodayJST(env);
 
   return new Response(
     JSON.stringify({ alreadySent }),
