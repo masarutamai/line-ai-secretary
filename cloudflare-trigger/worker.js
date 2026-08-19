@@ -156,6 +156,9 @@ export default {
 
   async fetch(request, env, ctx) {
 const url = new URL(request.url);
+if (url.pathname === "/favicon.ico") {
+  return new Response(null, { status: 204 });
+}
 const testTime = url.searchParams.get("testTime");
 const testAlreadySent = url.searchParams.get("testAlreadySent");
 if (url.pathname === "/test-dispatch-history") {
