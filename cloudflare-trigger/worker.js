@@ -258,7 +258,7 @@ await writeJudgmentLog(
   "morning_report",
   decision,
   "high",
-  reason
+  reason,
   requestId
 );
 if (decision === "skip") {
