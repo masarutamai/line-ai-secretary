@@ -155,7 +155,15 @@ export default {
   },
 
   async fetch(request, env, ctx) {
+const requestId = crypto.randomUUID();
 const url = new URL(request.url);
+console.log("FETCH_ENTRY", {
+  requestId,
+  pathname: url.pathname,
+  search: url.search,
+  method: request.method,
+  userAgent: request.headers.get("user-agent")
+});
 if (url.pathname === "/favicon.ico") {
   return new Response(null, { status: 204 });
 }
