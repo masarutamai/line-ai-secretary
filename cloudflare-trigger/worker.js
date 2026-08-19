@@ -72,7 +72,7 @@ async function hasSuccessfulDispatchTodayJST(env) {
   return rows.length > 0;
 }
 
-async function writeJudgmentLog(env, subject, decision, confidence, reason) {
+async function writeJudgmentLog(env, subject, decision, confidence, reason, requestId) {
   const allowedDecisions = ["send", "skip", "defer", "alert"];
   const allowedConfidence = ["high", "medium", "low"];
 
@@ -95,11 +95,12 @@ async function writeJudgmentLog(env, subject, decision, confidence, reason) {
         Prefer: "return=minimal",
       },
       body: JSON.stringify({
-        subject,
-        decision,
-        confidence,
-        reason,
-      }),
+  subject,
+  decision,
+  confidence,
+  reason,
+  request_id: requestId,
+}),
     }
   );
 
@@ -258,6 +259,7 @@ await writeJudgmentLog(
   decision,
   "high",
   reason
+  requestId
 );
 if (decision === "skip") {
   return new Response(
