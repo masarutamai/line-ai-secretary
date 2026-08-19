@@ -224,8 +224,9 @@ if (response.ok) {
 const alreadySent =
   testAlreadySent === "false"
     ? false
-    : await hasSuccessfulDispatchTodayJST(env);
-
+    : testAlreadySent === "true"
+      ? true
+      : await hasSuccessfulDispatchTodayJST(env);
 const withinWindow = isMorningReportWindowJST(
   testTime ? new Date(`2026-08-14T${testTime}:00+09:00`) : new Date()
 );
